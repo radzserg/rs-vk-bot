@@ -1,0 +1,29 @@
+{
+  "name": "rs-vk-bot",
+  "version": "0.0.1",
+  "description": "vk chat bot",
+  "scripts": {
+    "test": "jest",
+    "build": "rm -Rf ./dist/* && NODE_ENV=production tsc --build tsconfig.json",
+    "copy:package": "cp README.md package.json dist/",
+    "deploy": "npm run build && npm run copy:package && npm publish dist"
+  },
+  "keywords": [
+    "vk",
+    "chatbot"
+  ],
+  "homepage": "",
+  "author": "Sergey Radzishevskii <radzserg@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "query-string": "^6.8.3",
+    "rsed": "0.0.2"
+  }
+}

@@ -1,0 +1,12 @@
+# build
+dist/
+
+# deps
+node_modules/
+
+# IDE
+.idea/
+
+# tmp
+tmp/
+src/test.ts
