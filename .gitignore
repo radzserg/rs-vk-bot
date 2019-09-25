@@ -9,4 +9,4 @@ node_modules/
 
 # tmp
 tmp/
-src/test.ts
+tmp/test.ts

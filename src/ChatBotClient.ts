@@ -22,7 +22,8 @@ export default class ChatBotClient {
         pollingTimeout: 10,
         executeTimeout: 50,
     };
-    private eventDispatcher: EventDispatcher;
+    private readonly eventDispatcher: EventDispatcher;
+    private readonly updateListener: VkUpdateListener;
 
     constructor(token: string, settings?: IChatBotClientSettings) {
         this.token = token;
@@ -30,13 +31,12 @@ export default class ChatBotClient {
             ...this.settings,
             ...settings,
         };
+        this.updateListener = new VkUpdateListener();
         this.eventDispatcher = new EventDispatcher();
-        this.eventDispatcher.addListenerProvider(
-            new VkUpdateListener()
-        );
+        this.eventDispatcher.addListenerProvider(this.updateListener);
     }
 
-    async start() {
+    public async start() {
         await this.defineGroupId();
         const longPollingServerData = await this.getLongPollingServer();
         const longPollServer = new LongPollingServer(
@@ -44,7 +44,6 @@ export default class ChatBotClient {
             this.eventDispatcher,
             this.settings.pollingTimeout
         );
-        console.log("Start polling");
         try {
             await longPollServer.startPolling();
         } catch (error) {
@@ -53,6 +52,15 @@ export default class ChatBotClient {
                 await this.start();
             }
         }
+    }
+
+    /**
+     * Adds vk update listener
+     * @param eventName - vk update type, i.e. message_new, message_typing_state
+     * @param callback - callback handler
+     */
+    public on(eventName: string, callback: Function) {
+        this.updateListener.on(eventName, callback);
     }
 
     private async getLongPollingServer(): Promise<ILongPollingServer> {
