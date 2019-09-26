@@ -1,6 +1,8 @@
-import VkUpdatesListener from "./VkUpdatesListener";
-import VkUpdatesHandler from "./VkUpdatesHandler";
+import VkUpdatesListener from "./updates/VkUpdatesListener";
+import VkUpdatesHandler from "./updates/VkUpdatesHandler";
 import VkApi from "./VkApi";
+import VkResponse from "./responses/VkResponse";
+import Responder from "./responses/Responder";
 
 interface IChatBotClientSettings {
     pollingTimeout: number;
@@ -14,6 +16,7 @@ export default class ChatBotClient {
     };
     private updatesHandler: VkUpdatesHandler;
     private readonly vkApi: VkApi;
+    private responder: Responder;
 
     constructor(token: string, settings?: IChatBotClientSettings) {
         this.settings = {
@@ -23,6 +26,7 @@ export default class ChatBotClient {
         this.vkApi = new VkApi(token);
 
         this.updatesHandler = new VkUpdatesHandler();
+        this.responder = new Responder(this.settings.executeTimeout);
     }
 
     public async start() {
@@ -37,6 +41,13 @@ export default class ChatBotClient {
         for await (let updates of updatesListener.start()) {
             this.updatesHandler.handle(updates);
         }
+    }
+
+    /**
+     * Reply to user
+     */
+    public reply(userId: string | string[], message: VkResponse) {
+        this.responder.reply(userId, message);
     }
 
     /**

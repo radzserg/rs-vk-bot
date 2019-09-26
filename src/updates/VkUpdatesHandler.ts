@@ -1,5 +1,5 @@
-import { VkUpdate } from "./messages/VkUpdate";
-import VkResponse from "./messages/VkResponse";
+import { VkUpdate } from "./VkUpdate";
+import VkResponse from "../responses/VkResponse";
 
 interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];

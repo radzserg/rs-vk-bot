@@ -1,6 +1,6 @@
 import axios from "axios";
-import { VkUpdate } from "./messages/VkUpdate";
-import VkApi, { ILongPollingServerData } from "./VkApi";
+import { VkUpdate } from "./VkUpdate";
+import VkApi, { ILongPollingServerData } from "../VkApi";
 import Debugger from "debug";
 
 class PollingError extends Error {
