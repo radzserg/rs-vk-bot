@@ -1,15 +1,23 @@
 import axios from "axios";
 import { VkUpdate } from "./messages/VkUpdate";
 import VkApi, { ILongPollingServerData } from "./VkApi";
+import Debugger from "debug";
 
-export class PollingError extends Error {}
+class PollingError extends Error {
+    constructor(message: string) {
+        super(message);
+        Object.setPrototypeOf(this, PollingError.prototype);
+    }
+}
+
+const debug = Debugger("rs-vk-bot");
 
 /**
  * Listen for updates from VK via long polling
  */
 export default class VkUpdatesListener {
-    private vkApi: VkApi;
-    private groupId: string;
+    private readonly vkApi: VkApi;
+    private readonly groupId: string;
     private pollingTimeout: number;
 
     private ts: string;
@@ -27,6 +35,7 @@ export default class VkUpdatesListener {
         const longPollingServerData: ILongPollingServerData = await this.vkApi.getLongPollingServer(
             this.groupId
         );
+        debug("Start polling VK server");
 
         try {
             for await (let updates of this.pollServer(longPollingServerData)) {
@@ -34,8 +43,12 @@ export default class VkUpdatesListener {
             }
         } catch (error) {
             if (error instanceof PollingError) {
-                console.error("Polling error, restarting polling", error);
-                await this.start();
+                debug(
+                    `Polling error, restarting polling\nDetails${error.message}`
+                );
+                for await (let updates of this.start()) {
+                    yield updates;
+                }
             }
         }
     }
