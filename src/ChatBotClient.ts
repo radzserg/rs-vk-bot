@@ -1,6 +1,8 @@
 import axios from "axios";
 import queryString from "query-string";
-import Polling, { PollingError } from "./Polling";
+import VkUpdatesListener, { PollingError } from "./VkUpdatesListener";
+import VkUpdatesHandler from "./VkUpdatesHandler";
+import { VkUpdate } from "./messages/VkUpdate";
 
 interface ILongPollingServer {
     key: string;
@@ -20,6 +22,7 @@ export default class ChatBotClient {
         pollingTimeout: 25,
         executeTimeout: 50,
     };
+    private updatesHandler: VkUpdatesHandler;
 
     constructor(token: string, settings?: IChatBotClientSettings) {
         this.token = token;
@@ -27,19 +30,20 @@ export default class ChatBotClient {
             ...this.settings,
             ...settings,
         };
+        this.updatesHandler = new VkUpdatesHandler();
     }
 
     public async start() {
         await this.defineGroupId();
         const longPollingServerData = await this.getLongPollingServer();
-        const longPollServer = new Polling(
+        const longPollServer = new VkUpdatesListener(
             longPollingServerData,
             this.settings.pollingTimeout
         );
 
         try {
             for await (let updates of longPollServer.start()) {
-                console.log(updates);
+                this.updatesHandler.handle(updates);
             }
         } catch (error) {
             if (error instanceof PollingError) {
@@ -50,12 +54,12 @@ export default class ChatBotClient {
     }
 
     /**
-     * Adds vk update listener
+     * Set callbacks for eventNames
      * @param eventName - vk update type, i.e. message_new, message_typing_state
      * @param callback - callback handler
      */
     public on(eventName: string, callback: Function) {
-        // this.updateListener.on(eventName, callback);
+        this.updatesHandler.on(eventName, callback)
     }
 
     private async getLongPollingServer(): Promise<ILongPollingServer> {

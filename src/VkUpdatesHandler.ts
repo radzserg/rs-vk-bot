@@ -1,4 +1,3 @@
-import VkUpdatesReceived from "./events/VkUpdatesReceived";
 import { VkUpdate } from "./messages/VkUpdate";
 import VkResponse from "./messages/VkResponse";
 
@@ -6,7 +5,7 @@ interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];
 }
 
-export default class VkUpdateListener  {
+export default class VkUpdatesHandler  {
 
     private updateHandlers: IVkUpdateHandlers = {};
 
@@ -17,19 +16,15 @@ export default class VkUpdateListener  {
         this.updateHandlers[eventName].push(callback);
     }
 
-    private handleUpdates = (event: VkUpdatesReceived) => {
-        const updates = event.getUpdates();
-        updates.forEach((update: VkUpdate) => {
+    public handle = (updates: VkUpdate[]) => {
+        for (let update of updates) {
             const updateType = update.type;
             const handlers = this.updateHandlers[updateType];
             if (handlers !== undefined) {
-                handlers.forEach((handler: Function) => {
-                    const response = handler(update.object);
-                    if (response && response instanceof VkResponse) {
-
-                    }
-                })
+                for (let handler of handlers) {
+                    handler(update.object);
+                }
             }
-        });
+        }
     }
 }

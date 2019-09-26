@@ -9,7 +9,7 @@ interface ILongPollingServerData {
 
 export class PollingError extends Error {}
 
-export default class Polling {
+export default class VkUpdatesListener {
     private serverUrl: string;
     private secretKey: string;
     private ts: string;
@@ -25,7 +25,7 @@ export default class Polling {
         this.pollingTimeout = pollingTimeout
     }
 
-    public async *start() {
+    public async *start(): AsyncIterable<VkUpdate[]> {
         while (true) {
             const response = await axios.get(this.serverUrl, {
                 params: {
