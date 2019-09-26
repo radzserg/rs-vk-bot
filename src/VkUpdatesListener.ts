@@ -1,42 +1,66 @@
 import axios from "axios";
 import { VkUpdate } from "./messages/VkUpdate";
-
-interface ILongPollingServerData {
-    key: string;
-    server: string;
-    ts: string;
-}
+import VkApi, { ILongPollingServerData } from "./VkApi";
 
 export class PollingError extends Error {}
 
+/**
+ * Listen for updates from VK via long polling
+ */
 export default class VkUpdatesListener {
-    private serverUrl: string;
-    private secretKey: string;
-    private ts: string;
+    private vkApi: VkApi;
+    private groupId: string;
     private pollingTimeout: number;
 
-    constructor(
-        serverData: ILongPollingServerData,
-        pollingTimeout: number
-    ) {
-        this.serverUrl = serverData.server;
-        this.secretKey = serverData.key;
-        this.ts = serverData.ts;
-        this.pollingTimeout = pollingTimeout
+    private ts: string;
+
+    constructor(vkApi: VkApi, groupId: string, pollingTimeout: number) {
+        this.vkApi = vkApi;
+        this.groupId = groupId;
+        this.pollingTimeout = pollingTimeout;
     }
 
+    /**
+     * Fetches long poll server data and start polling server
+     */
     public async *start(): AsyncIterable<VkUpdate[]> {
+        const longPollingServerData: ILongPollingServerData = await this.vkApi.getLongPollingServer(
+            this.groupId
+        );
+
+        try {
+            for await (let updates of this.pollServer(longPollingServerData)) {
+                yield updates;
+            }
+        } catch (error) {
+            if (error instanceof PollingError) {
+                console.error("Polling error, restarting polling", error);
+                await this.start();
+            }
+        }
+    }
+
+    /**
+     * Poll server and liisten for updates from VK
+     * @param longPollingServerData
+     */
+    public async *pollServer(
+        longPollingServerData: ILongPollingServerData
+    ): AsyncIterable<VkUpdate[]> {
+        const { server, key, ts } = longPollingServerData;
         while (true) {
-            const response = await axios.get(this.serverUrl, {
-                params: {
-                    key: this.secretKey,
-                    ts: this.ts,
-                    act: "a_check",
-                    wait: this.pollingTimeout,
-                },
-            }).catch((err) => {
-                throw new PollingError(err);
-            });
+            const response = await axios
+                .get(server, {
+                    params: {
+                        key,
+                        ts,
+                        act: "a_check",
+                        wait: this.pollingTimeout,
+                    },
+                })
+                .catch(err => {
+                    throw new PollingError(err);
+                });
 
             const body = response.data;
             this.ts = body.ts;
