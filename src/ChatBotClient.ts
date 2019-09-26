@@ -23,10 +23,10 @@ export default class ChatBotClient {
             ...this.settings,
             ...settings,
         };
-        this.vkApi = new VkApi(token);
+        this.vkApi = new VkApi(token, this.settings.executeTimeout);
 
         this.updatesHandler = new UpdatesHandler();
-        this.responder = new Responder(this.settings.executeTimeout);
+        this.responder = new Responder(this.vkApi);
     }
 
     /**

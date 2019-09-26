@@ -37,6 +37,7 @@ export default class UpdatesListener {
         );
         debug("Start polling VK server");
 
+        this.ts = longPollingServerData.ts;
         try {
             for await (let updates of this.pollServer(longPollingServerData)) {
                 yield updates;
@@ -66,7 +67,7 @@ export default class UpdatesListener {
                 .get(server, {
                     params: {
                         key,
-                        ts,
+                        ts: this.ts,
                         act: "a_check",
                         wait: this.pollingTimeout,
                     },

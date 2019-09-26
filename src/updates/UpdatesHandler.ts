@@ -5,8 +5,7 @@ interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];
 }
 
-export default class UpdatesHandler  {
-
+export default class UpdatesHandler {
     private updateHandlers: IVkUpdateHandlers = {};
 
     on(eventName: string, callback: Function) {
@@ -26,5 +25,5 @@ export default class UpdatesHandler  {
                 }
             }
         }
-    }
+    };
 }
