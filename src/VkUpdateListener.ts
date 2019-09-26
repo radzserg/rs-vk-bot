@@ -1,22 +1,14 @@
-import { AppEventHandler, IListenerProvider } from "rsed";
 import VkUpdatesReceived from "./events/VkUpdatesReceived";
-import { VkUpdate } from "./updates/VkUpdate";
-
+import { VkUpdate } from "./messages/VkUpdate";
+import VkResponse from "./messages/VkResponse";
 
 interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];
 }
 
-export default class VkUpdateListener implements IListenerProvider {
-    private updateHandlers: IVkUpdateHandlers = {};
+export default class VkUpdateListener  {
 
-    // private handlers
-    getListenersForEvent(event: object): AppEventHandler[] {
-        if (event instanceof VkUpdatesReceived) {
-            return [this.handleUpdates];
-        }
-        return [];
-    }
+    private updateHandlers: IVkUpdateHandlers = {};
 
     on(eventName: string, callback: Function) {
         if (this.updateHandlers[eventName] === undefined) {
@@ -32,7 +24,10 @@ export default class VkUpdateListener implements IListenerProvider {
             const handlers = this.updateHandlers[updateType];
             if (handlers !== undefined) {
                 handlers.forEach((handler: Function) => {
-                    handler(update.object);
+                    const response = handler(update.object);
+                    if (response && response instanceof VkResponse) {
+
+                    }
                 })
             }
         });

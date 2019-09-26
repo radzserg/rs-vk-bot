@@ -1,8 +1,6 @@
 import axios from "axios";
 import queryString from "query-string";
-import LongPollingServer, { PollingError } from "./LongPollingServer";
-import EventDispatcher from "rsed";
-import VkUpdateListener from "./VkUpdateListener";
+import Polling, { PollingError } from "./Polling";
 
 interface ILongPollingServer {
     key: string;
@@ -19,11 +17,9 @@ export default class ChatBotClient {
     private readonly token: string;
     private groupId: string;
     private readonly settings: IChatBotClientSettings = {
-        pollingTimeout: 10,
+        pollingTimeout: 25,
         executeTimeout: 50,
     };
-    private readonly eventDispatcher: EventDispatcher;
-    private readonly updateListener: VkUpdateListener;
 
     constructor(token: string, settings?: IChatBotClientSettings) {
         this.token = token;
@@ -31,24 +27,23 @@ export default class ChatBotClient {
             ...this.settings,
             ...settings,
         };
-        this.updateListener = new VkUpdateListener();
-        this.eventDispatcher = new EventDispatcher();
-        this.eventDispatcher.addListenerProvider(this.updateListener);
     }
 
     public async start() {
         await this.defineGroupId();
         const longPollingServerData = await this.getLongPollingServer();
-        const longPollServer = new LongPollingServer(
+        const longPollServer = new Polling(
             longPollingServerData,
-            this.eventDispatcher,
             this.settings.pollingTimeout
         );
+
         try {
-            await longPollServer.startPolling();
+            for await (let updates of longPollServer.start()) {
+                console.log(updates);
+            }
         } catch (error) {
             if (error instanceof PollingError) {
-                console.error("Polling error", error);
+                console.error("Polling error, restarting polling", error);
                 await this.start();
             }
         }
@@ -60,7 +55,7 @@ export default class ChatBotClient {
      * @param callback - callback handler
      */
     public on(eventName: string, callback: Function) {
-        this.updateListener.on(eventName, callback);
+        // this.updateListener.on(eventName, callback);
     }
 
     private async getLongPollingServer(): Promise<ILongPollingServer> {
