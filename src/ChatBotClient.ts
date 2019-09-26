@@ -1,6 +1,6 @@
-import VkUpdatesListener from "./updates/VkUpdatesListener";
-import VkUpdatesHandler from "./updates/VkUpdatesHandler";
-import VkApi from "./VkApi";
+import UpdatesListener from "./updates/UpdatesListener";
+import UpdatesHandler from "./updates/UpdatesHandler";
+import VkApi from "./api/VkApi";
 import VkResponse from "./responses/VkResponse";
 import Responder from "./responses/Responder";
 
@@ -14,7 +14,7 @@ export default class ChatBotClient {
         pollingTimeout: 25,
         executeTimeout: 50,
     };
-    private updatesHandler: VkUpdatesHandler;
+    private updatesHandler: UpdatesHandler;
     private readonly vkApi: VkApi;
     private responder: Responder;
 
@@ -25,14 +25,17 @@ export default class ChatBotClient {
         };
         this.vkApi = new VkApi(token);
 
-        this.updatesHandler = new VkUpdatesHandler();
+        this.updatesHandler = new UpdatesHandler();
         this.responder = new Responder(this.settings.executeTimeout);
     }
 
+    /**
+     * Starts chat bot. It will listen for updates from VK
+     */
     public async start() {
         const groupId = await this.vkApi.getGroupId();
 
-        const updatesListener = new VkUpdatesListener(
+        const updatesListener = new UpdatesListener(
             this.vkApi,
             groupId,
             this.settings.pollingTimeout

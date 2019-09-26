@@ -1,6 +1,6 @@
 import axios from "axios";
 import { VkUpdate } from "./VkUpdate";
-import VkApi, { ILongPollingServerData } from "../VkApi";
+import VkApi, { ILongPollingServerData } from "../api/VkApi";
 import Debugger from "debug";
 
 class PollingError extends Error {
@@ -15,7 +15,7 @@ const debug = Debugger("rs-vk-bot");
 /**
  * Listen for updates from VK via long polling
  */
-export default class VkUpdatesListener {
+export default class UpdatesListener {
     private readonly vkApi: VkApi;
     private readonly groupId: string;
     private pollingTimeout: number;

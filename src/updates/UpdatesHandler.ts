@@ -5,7 +5,7 @@ interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];
 }
 
-export default class VkUpdatesHandler  {
+export default class UpdatesHandler  {
 
     private updateHandlers: IVkUpdateHandlers = {};
 
