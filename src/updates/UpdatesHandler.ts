@@ -1,5 +1,4 @@
-import { VkUpdate } from "./VkUpdate";
-import VkResponse from "../responses/VkResponse";
+import { VkUpdateEvent } from "./VkUpdateEvent";
 
 interface IVkUpdateHandlers {
     [vkUpdateName: string]: Function[];
@@ -15,7 +14,7 @@ export default class UpdatesHandler {
         this.updateHandlers[eventName].push(callback);
     }
 
-    public handle = (updates: VkUpdate[]) => {
+    public handle = (updates: VkUpdateEvent[]) => {
         for (let update of updates) {
             const updateType = update.type;
             const handlers = this.updateHandlers[updateType];

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { VkUpdate } from "./VkUpdate";
+import { VkUpdateEvent } from "./VkUpdateEvent";
 import VkApi, { ILongPollingServerData } from "../api/VkApi";
 import Debugger from "debug";
 
@@ -31,7 +31,7 @@ export default class UpdatesListener {
     /**
      * Fetches long poll server data and start polling server
      */
-    public async *start(): AsyncIterable<VkUpdate[]> {
+    public async *start(): AsyncIterable<VkUpdateEvent[]> {
         const longPollingServerData: ILongPollingServerData = await this.vkApi.getLongPollingServer(
             this.groupId
         );
@@ -60,7 +60,7 @@ export default class UpdatesListener {
      */
     public async *pollServer(
         longPollingServerData: ILongPollingServerData
-    ): AsyncIterable<VkUpdate[]> {
+    ): AsyncIterable<VkUpdateEvent[]> {
         const { server, key, ts } = longPollingServerData;
         while (true) {
             const response = await axios
@@ -85,7 +85,7 @@ export default class UpdatesListener {
                 }
             }
 
-            yield body.updates as VkUpdate[];
+            yield body.updates as VkUpdateEvent[];
         }
     }
 }

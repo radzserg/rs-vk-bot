@@ -49,7 +49,7 @@ export default class ChatBotClient {
     /**
      * Reply to user
      */
-    public reply(userId: string | string[], message: VkResponse) {
+    public reply(userId: string | string[] | number | number[], message: VkResponse) {
         this.responder.reply(userId, message);
     }
 
