@@ -1,11 +1,11 @@
-import KeyboardButton from "./KeyboardButton";
+import KeyboardButton, { VkButtonType } from "./KeyboardButton";
 
 type ButtonColor = "primary" | "secondary" | "negative" | "positive";
 
 export default class TextButton extends KeyboardButton {
+    protected type: VkButtonType = "text";
     private readonly label: string;
     private readonly color: ButtonColor;
-    private readonly payload: any;
 
     constructor(
         label: string,
@@ -21,7 +21,7 @@ export default class TextButton extends KeyboardButton {
     toJSON() {
         return {
             action: {
-                type: 'text',
+                type: this.type,
                 payload: JSON.stringify(this.payload),
                 label: this.label,
             },

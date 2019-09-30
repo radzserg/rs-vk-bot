@@ -27,7 +27,8 @@ vkClient.start();
             new TextButton("Football", 'positive'),
             new TextButton("Basketball", 'negative'),
             new TextButton("Tennis", 'secondary')
-        ])
+        ]),
+        new ButtonsRow([new LocationButton({some: "payload"})]),
     ]).oneTime();
     client.reply("1123441", {
         message: 'Select your sport',

@@ -1,6 +1,6 @@
 {
   "name": "rs-vk-bot",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "vk chat bot",
   "scripts": {
     "test": "jest",
