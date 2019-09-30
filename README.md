@@ -18,3 +18,19 @@ vkClient.on("message_new", async (vkMessage: VkMessage) => {
 vkClient.start();
 
 ```
+
+### VK keyboard
+
+```
+ const keyboard = new Keyboard([
+        new ButtonsRow([
+            new TextButton("Football", 'positive'),
+            new TextButton("Basketball", 'negative'),
+            new TextButton("Tennis", 'secondary')
+        ])
+    ]).oneTime();
+    client.reply("1123441", {
+        message: 'Select your sport',
+        keyboard: keyboard
+    });
+```

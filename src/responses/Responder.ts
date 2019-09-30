@@ -8,7 +8,10 @@ export default class Responder {
         this.vkApi = vkApi;
     }
 
-    public reply(userId: string | string[] | number | number[], response: VkResponse) {
+    public reply(
+        userId: string | string[] | number | number[],
+        response: VkResponse
+    ) {
         if (Array.isArray(userId) && userId.length > 100) {
             throw new Error(
                 "Message can't be sent to more than 100 recipients."
